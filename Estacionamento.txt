@@ -1,0 +1,93 @@
+using System;
+using System.Collections.Generic;
+
+class Veiculo {
+    public string Placa { get; set; }
+    public DateTime Entrada { get; set; }
+
+    public Veiculo(string placa) {
+        Placa = placa;
+        Entrada = DateTime.Now;
+    }
+}
+
+class Estacionamento {
+    private List<Veiculo> veiculosEstacionados = new List<Veiculo>();
+
+    public void AdicionarVeiculo(Veiculo veiculo) {
+        veiculosEstacionados.Add(veiculo);
+        Console.WriteLine($"Veículo {veiculo.Placa} estacionado.");
+    }
+
+    public void RemoverVeiculo(string placa) {
+        Veiculo veiculo = veiculosEstacionados.Find(v => v.Placa == placa);
+
+        if (veiculo != null) {
+            TimeSpan duracao = DateTime.Now - veiculo.Entrada;
+            double valorCobrado = CalcularValorCobrado(duracao);
+
+            Console.WriteLine($"Veículo {veiculo.Placa} removido.");
+            Console.WriteLine($"Tempo estacionado: {duracao.TotalMinutes} minutos");
+            Console.WriteLine($"Valor cobrado: R${valorCobrado:F2}");
+
+            veiculosEstacionados.Remove(veiculo);
+        } else {
+            Console.WriteLine($"Veículo com placa {placa} não encontrado.");
+        }
+    }
+
+    public void ListarVeiculos() {
+        Console.WriteLine("Veículos estacionados:");
+        foreach (var veiculo in veiculosEstacionados) {
+            Console.WriteLine($"Placa: {veiculo.Placa}, Entrada: {veiculo.Entrada}");
+        }
+    }
+
+    private double CalcularValorCobrado(TimeSpan duracao) {
+        // Exemplo simplificado: R$0,50 por minuto
+        return duracao.TotalMinutes * 0.50;
+    }
+}
+
+class Program {
+    static void Main() {
+        Estacionamento estacionamento = new Estacionamento();
+
+        while (true) {
+            Console.WriteLine("\nEscolha uma opção:");
+            Console.WriteLine("1. Adicionar veículo");
+            Console.WriteLine("2. Remover veículo");
+            Console.WriteLine("3. Listar veículos");
+            Console.WriteLine("4. Sair");
+
+            string opcao = Console.ReadLine();
+
+            switch (opcao) {
+                case "1":
+                    Console.Write("Digite a placa do veículo: ");
+                    string placaAdicionar = Console.ReadLine();
+                    Veiculo veiculoAdicionar = new Veiculo(placaAdicionar);
+                    estacionamento.AdicionarVeiculo(veiculoAdicionar);
+                    break;
+
+                case "2":
+                    Console.Write("Digite a placa do veículo a ser removido: ");
+                    string placaRemover = Console.ReadLine();
+                    estacionamento.RemoverVeiculo(placaRemover);
+                    break;
+
+                case "3":
+                    estacionamento.ListarVeiculos();
+                    break;
+
+                case "4":
+                    Console.WriteLine("Saindo do programa.");
+                    return;
+
+                default:
+                    Console.WriteLine("Opção inválida. Tente novamente.");
+                    break;
+            }
+        }
+    }
+}
